@@ -1,0 +1,1 @@
+rule-engine that consumes messages from kafka and publishes events on the camunda bpmn execution engine if rules (provided by the event-broker) match the message
