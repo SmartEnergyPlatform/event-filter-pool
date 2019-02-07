@@ -17,81 +17,26 @@
 package lib
 
 import (
+	"github.com/SENERGY-Platform/iot-broker-client"
 	"github.com/SmartEnergyPlatform/event-filter-pool/util"
 	"log"
 
 	"encoding/json"
 
-	"time"
-
-	"github.com/wvanbergen/kafka/consumergroup"
-	kazoo "github.com/wvanbergen/kazoo-go"
 )
 
-func InitConsumer() {
-	defer CloseProducer()
-	Produce(util.Config.PoolId, "topic_init")
-
-	zk, chroot := kazoo.ParseConnectionString(util.Config.ZookeeperUrl)
-	kafkaconf := consumergroup.NewConfig()
-	kafkaconf.Consumer.Return.Errors = util.Config.FatalKafkaErrors == "true"
-	kafkaconf.Zookeeper.Chroot = chroot
-	consumerGroupName := util.Config.PoolId
-	consumer, err := consumergroup.JoinConsumerGroup(
-		consumerGroupName,
-		[]string{util.Config.PoolId},
-		zk,
-		kafkaconf)
-
-	if err != nil {
-		log.Fatal("error in consumergroup.JoinConsumerGroup()", err)
-	}
-
-	defer consumer.Close()
-
-	kafkaTimeout := util.Config.KafkaTimeout
-	useTimeout := true
-	if kafkaTimeout <= 0 {
-		useTimeout = false
-		kafkaTimeout = 3600
-	}
-	kafkaping := time.NewTicker(time.Second * time.Duration(kafkaTimeout/2))
-	kafkatimout := time.NewTicker(time.Second * time.Duration(kafkaTimeout))
-
-	timeout := false
-
-	for {
-		select {
-		case <-kafkaping.C:
-			if useTimeout && timeout {
-				Produce(util.Config.PoolId, "topic_init")
-			}
-		case <-kafkatimout.C:
-			if useTimeout && timeout {
-				log.Fatal("ERROR: kafka missing ping timeout")
-			}
-			timeout = true
-		case errMsg := <-consumer.Errors():
-			log.Fatal("kafka consumer error: ", errMsg)
-		case msg, ok := <-consumer.Messages():
-			if !ok {
-				log.Fatal("empty kafka consumer")
-			} else {
-				if string(msg.Value) != "topic_init" {
-					HandleMessage(msg.Topic, string(msg.Value))
-				}
-				timeout = false
-				consumer.CommitUpto(msg)
-			}
-		}
-	}
+func InitConsumer() (consumer *iot_broker_client.Consumer,err error) {
+	consumer, err = iot_broker_client.NewConsumer(util.Config.AmqpUrl, util.Config.PoolId, util.Config.FilterTopic, false, func(msg []byte) error {
+		go HandleMessage(util.Config.FilterTopic, string(msg))
+		return nil
+	})
+	return
 }
 
 type Envelope struct {
-	DeviceId    string      `json:"device_id,omitempty"`
-	ServiceId   string      `json:"service_id,omitempty"`
-	Value       interface{} `json:"value"`
-	SourceTopic string      `json:"source_topic"`
+	DeviceId  string      `json:"device_id,omitempty"`
+	ServiceId string      `json:"service_id,omitempty"`
+	Value     interface{} `json:"value"`
 }
 
 func HandleMessage(topic string, msg string) {
@@ -102,7 +47,7 @@ func HandleMessage(topic string, msg string) {
 		log.Println("ERROR: ", err)
 		return
 	}
-	FilterPool().Dispatch(envelope.SourceTopic, envelope.DeviceId, envelope.ServiceId, msg)
+	FilterPool().Dispatch(topic, envelope.DeviceId, envelope.ServiceId, msg)
 }
 
 type PrefixMessage struct {

@@ -33,5 +33,4 @@ func main() {
 	}
 
 	lib.StartManagerConnection()
-	lib.InitConsumer()
 }

@@ -18,15 +18,20 @@ package lib
 
 import (
 	"encoding/json"
+	"github.com/SENERGY-Platform/iot-broker-client"
+	"github.com/SmartEnergyPlatform/event-filter-pool/lib/kafka"
+	"github.com/SmartEnergyPlatform/event-filter-pool/util"
 	"log"
 	"sync"
 )
 
 type FilterCollection struct {
-	mux        sync.Mutex
-	idIndex    map[string]*Filter            //filterid
-	routeIndex map[string]map[string]*Filter //safeConcat(device.service.topic).filterid
-	size       int
+	mux           sync.Mutex
+	idIndex       map[string]*Filter            //filterid
+	routeIndex    map[string]map[string]*Filter //safeConcat(device.service.topic).filterid
+	size          int
+	consumer      *iot_broker_client.Consumer
+	kafkaconsumer *kafka.KafkaMultiConsumer
 }
 
 func safeConcat(device string, service string, topic string) string {
@@ -39,12 +44,24 @@ var onceSessionsCollection sync.Once
 
 func FilterPool() *FilterCollection {
 	onceSessionsCollection.Do(func() {
-		ClearPts()
 		sessionsCollection = &FilterCollection{
 			idIndex:    map[string]*Filter{},
 			routeIndex: map[string]map[string]*Filter{},
 			size:       0,
 		}
+		var err error
+		sessionsCollection.consumer, err = InitConsumer()
+		if err != nil {
+			log.Fatal("unable to start amqp consumer", err)
+		}
+		sessionsCollection.consumer.ResetBindings()
+		sessionsCollection.kafkaconsumer = kafka.NewKafkaMultiConsumer(util.Config.ZookeeperUrl, util.Config.PoolId, func(topic string, msg []byte) error {
+			go HandleMessage(topic, string(msg))
+			return nil
+		}, func(err error) {
+			log.Println("ERROR: while consuming from kafka", err)
+			sessionsCollection.kafkaconsumer.Reset()
+		})
 	})
 	return sessionsCollection
 }
@@ -72,9 +89,18 @@ func (this *FilterCollection) Register(filter *Filter) (err error) {
 	defer this.mux.Unlock()
 	this.idIndex[filter.Id] = filter
 	if _, ok := this.routeIndex[safeConcat(filter.DeviceId, filter.ServiceId, filter.Topic)]; !ok {
-		err = RegisterPts(filter.DeviceId, filter.ServiceId, filter.Topic)
-		if err != nil {
-			return err
+		if filter.Topic == util.Config.FilterTopic {
+			err = this.consumer.Bind(filter.DeviceId, filter.ServiceId)
+			if err != nil {
+				log.Println("ERROR: unable to bind to amqp topic", filter, err)
+				return err
+			}
+		} else {
+			err = this.kafkaconsumer.Listen(filter.Topic)
+			if err != nil {
+				log.Println("ERROR: unable to listen to kafka topic", filter, err)
+				return err
+			}
 		}
 		this.routeIndex[safeConcat(filter.DeviceId, filter.ServiceId, filter.Topic)] = map[string]*Filter{}
 	}
@@ -92,9 +118,14 @@ func (this *FilterCollection) Deregister(filterId string) (err error) {
 	} else {
 		key := safeConcat(filter.DeviceId, filter.ServiceId, filter.Topic)
 		if len(this.routeIndex[key]) == 1 {
-			err = DeregisterPts(filter.DeviceId, filter.ServiceId, filter.Topic)
-			if err != nil {
-				return err
+			if filter.Topic == util.Config.FilterTopic {
+				err = this.consumer.Unbind(filter.DeviceId, filter.ServiceId)
+				if err != nil {
+					log.Println("ERROR: unable to unbind from amqp topic", filter, err)
+					return err
+				}
+			} else {
+				this.kafkaconsumer.Mute(filter.Topic)
 			}
 			delete(this.idIndex, filterId)
 			delete(this.routeIndex[key], filter.Id)
@@ -113,7 +144,8 @@ func (this *FilterCollection) GetSize() int {
 }
 
 func (this *FilterCollection) Reset() {
-	ClearPts()
+	this.consumer.ResetBindings()
+	this.kafkaconsumer.Reset()
 	this.mux.Lock()
 	this.idIndex = map[string]*Filter{}
 	this.routeIndex = map[string]map[string]*Filter{}

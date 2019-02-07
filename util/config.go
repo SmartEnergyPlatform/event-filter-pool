@@ -33,16 +33,13 @@ type ConfigStruct struct {
 
 	ZookeeperUrl string //host1:2181,host2:2181/chroot
 
-	KafkaTimeout int64
-	SaramaLog    string
-
 	ManagerCommandGetTimeout int64
 
-	PtsUrl           string
 	FilterManagerUrl string
 	CamundaUrl       string
 
-	FatalKafkaErrors string
+	FilterTopic		string
+	AmqpUrl			string
 }
 
 type ConfigType *ConfigStruct

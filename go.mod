@@ -1,18 +1,18 @@
 module github.com/SmartEnergyPlatform/event-filter-pool
 
 require (
+	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/JumboInteractiveLimited/jsonpath v0.0.0-20180321012328-6fcdcc9066b5
-	github.com/Shopify/sarama v1.11.0
-	github.com/davecgh/go-spew v0.0.0-20170711183451-adab96458c51
-	github.com/eapache/go-resiliency v0.0.0-20170607163615-b1fe83b5b03f
-	github.com/eapache/go-xerial-snappy v0.0.0-20160609142408-bb955e01b934
-	github.com/eapache/queue v1.1.0
-	github.com/golang/snappy v0.0.0-20170215233205-553a64147049
-	github.com/klauspost/crc32 v0.0.0-20170628072449-bab58d77464a
-	github.com/pierrec/lz4 v0.0.0-20170519170625-5a3d2245f97f
-	github.com/pierrec/xxHash v0.0.0-20170714082455-a0006b13c722
-	github.com/rcrowley/go-metrics v0.0.0-20161128210544-1f30fe9094a5
-	github.com/samuel/go-zookeeper v0.0.0-20161028232340-1d7be4effb13
-	github.com/wvanbergen/kafka v0.0.0-20160927093020-bc265fedb9ff
-	github.com/wvanbergen/kazoo-go v0.0.0-20160930072434-968957352185
+	github.com/Microsoft/go-winio v0.4.11 // indirect
+	github.com/SENERGY-Platform/iot-broker-client v0.0.0-20190206083222-04a05debe3a4
+	github.com/golang/snappy v0.0.0-20170215233205-553a64147049 // indirect
+	github.com/google/go-cmp v0.2.0 // indirect
+	github.com/gotestyourself/gotestyourself v2.2.0+incompatible // indirect
+	github.com/lib/pq v1.0.0 // indirect
+	github.com/pierrec/lz4 v0.0.0-20170519170625-5a3d2245f97f // indirect
+	github.com/pierrec/xxHash v0.0.0-20170714082455-a0006b13c722 // indirect
+	github.com/samuel/go-zookeeper v0.0.0-20161028232340-1d7be4effb13 // indirect
+	github.com/segmentio/kafka-go v0.2.2
+	github.com/wvanbergen/kazoo-go v0.0.0-20180202103751-f72d8611297a
+	gotest.tools v2.2.0+incompatible // indirect
 )

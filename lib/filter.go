@@ -17,6 +17,7 @@
 package lib
 
 import (
+	"github.com/SmartEnergyPlatform/event-filter-pool/util"
 	"log"
 
 	"strings"
@@ -44,6 +45,9 @@ type Operator func(string, string) bool
 func NewFilter(assignment FilterDeployment) (result Filter, err error) {
 	result = Filter{FilterDesc: assignment.Filter, Id: assignment.FilterId, scopeFn: getScopeFunction(assignment.Filter.Scope)}
 	result.compiledRules, err = compileRules(assignment.Filter.Rules)
+	if result.Topic == "" {
+		result.Topic = util.Config.FilterTopic
+	}
 	return
 }
 
