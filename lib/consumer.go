@@ -17,16 +17,15 @@
 package lib
 
 import (
-	"github.com/SENERGY-Platform/iot-broker-client"
+	"github.com/SENERGY-Platform/iot-broker-client-lib"
 	"github.com/SmartEnergyPlatform/event-filter-pool/util"
 	"log"
 
 	"encoding/json"
-
 )
 
-func InitConsumer() (consumer *iot_broker_client.Consumer,err error) {
-	consumer, err = iot_broker_client.NewConsumer(util.Config.AmqpUrl, util.Config.PoolId, util.Config.FilterTopic, false, func(msg []byte) error {
+func InitConsumer() (consumer *iot_broker_client_lib.Consumer, err error) {
+	consumer, err = iot_broker_client_lib.NewConsumer(util.Config.AmqpUrl, util.Config.PoolId, util.Config.FilterTopic, false, func(msg []byte) error {
 		go HandleMessage(util.Config.FilterTopic, string(msg))
 		return nil
 	})

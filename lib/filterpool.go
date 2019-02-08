@@ -18,7 +18,7 @@ package lib
 
 import (
 	"encoding/json"
-	"github.com/SENERGY-Platform/iot-broker-client"
+	"github.com/SENERGY-Platform/iot-broker-client-lib"
 	"github.com/SmartEnergyPlatform/event-filter-pool/lib/kafka"
 	"github.com/SmartEnergyPlatform/event-filter-pool/util"
 	"log"
@@ -30,7 +30,7 @@ type FilterCollection struct {
 	idIndex       map[string]*Filter            //filterid
 	routeIndex    map[string]map[string]*Filter //safeConcat(device.service.topic).filterid
 	size          int
-	consumer      *iot_broker_client.Consumer
+	consumer      *iot_broker_client_lib.Consumer
 	kafkaconsumer *kafka.KafkaMultiConsumer
 }
 

@@ -6,8 +6,8 @@ github.com/Microsoft/go-winio v0.4.11 h1:zoIOcVf0xPN1tnMVbTtEdI+P8OofVk3NObnwOQ6
 github.com/Microsoft/go-winio v0.4.11/go.mod h1:VhR8bwka0BXejwEJY73c50VrPtXAaKcyvVC4A4RozmA=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 h1:TngWCqHvy9oXAN6lEVMRuU21PR1EtLVZJmdB18Gu3Rw=
 github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5/go.mod h1:lmUJ/7eu/Q8D7ML55dXQrVaamCz2vxCfdQBasLZfHKk=
-github.com/SENERGY-Platform/iot-broker-client v0.0.0-20190206083222-04a05debe3a4 h1:UAOAug+DDgt04EQtYYagICyOKJzo+VA7yN4O6LOimJs=
-github.com/SENERGY-Platform/iot-broker-client v0.0.0-20190206083222-04a05debe3a4/go.mod h1:nZclPisFICTtN2RqbzSIMSSaF3JvcFMaGMfFRmMHCec=
+github.com/SENERGY-Platform/iot-broker-client-lib v0.0.0-20190208074750-ac832f94c68b h1:kubD1Y00B8hyanhLWaHaDPepJWHDQAeL1ULmUwJ/a5w=
+github.com/SENERGY-Platform/iot-broker-client-lib v0.0.0-20190208074750-ac832f94c68b/go.mod h1:c2+PT+rqvtKyVr/D27uHYJnvwUE4bljC/hjBTB0YVX8=
 github.com/cenkalti/backoff v2.1.1+incompatible h1:tKJnvO2kl0zmb/jA5UKAt4VoEVw1qxKWjE/Bpp46npY=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/containerd/continuity v0.0.0-20181203112020-004b46473808 h1:4BX8f882bXEDKfWIf0wa8HRvpnBoPszJJXL+TVbBw4M=
