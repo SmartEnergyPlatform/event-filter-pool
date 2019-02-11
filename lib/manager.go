@@ -29,15 +29,14 @@ import (
 func StartManagerConnection() {
 	log.Println("StartManagerConnection")
 	InitAssignments()
-	go func() {
-		for {
-			wait := NextManagerCommand()
-			if wait {
-				duration := time.Duration(util.Config.ManagerCommandGetTimeout) * time.Millisecond
-				time.Sleep(duration)
-			}
+	log.Println("Start command loop")
+	for {
+		wait := NextManagerCommand()
+		if wait {
+			duration := time.Duration(util.Config.ManagerCommandGetTimeout) * time.Millisecond
+			time.Sleep(duration)
 		}
-	}()
+	}
 }
 
 func InitAssignments() {
@@ -60,7 +59,6 @@ func NextManagerCommand() (wait bool) {
 
 func getAllAssignments() (assignments []FilterDeployment, err error) {
 	resp, err := http.Get(util.Config.FilterManagerUrl + "/pool/assignments/" + util.Config.PoolId)
-
 	if err != nil {
 		log.Println("error on getAllAssignments", err)
 		return assignments, err
@@ -119,7 +117,6 @@ func handleCommand(command string, assignments []FilterDeployment) {
 
 	default:
 		log.Println("WARNING: unknown command ", command)
-
 	}
 }
 
